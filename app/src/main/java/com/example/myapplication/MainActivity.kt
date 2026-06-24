@@ -14,18 +14,34 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import android.animation.ObjectAnimator
 import android.view.View
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
 import com.google.android.material.snackbar.Snackbar
+import android.net.Uri
+import com.tom_roush.pdfbox.pdmodel.PDDocument
+import com.tom_roush.pdfbox.text.PDFTextStripper
+import com.tom_roush.pdfbox.android.PDFBoxResourceLoader
+
+
+
 
 class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
     private lateinit var loadingDialog: Dialog
 
+    private val pdfPickerLauncher = registerForActivityResult(
+        ActivityResultContracts.GetContent()
+    ) { uri ->
+        uri?.let { handlePdfUri(it) }
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
+        PDFBoxResourceLoader.init(applicationContext)
 
         loadingDialog = Dialog(this).apply {
             setContentView(R.layout.dialog_loading)
@@ -95,6 +111,9 @@ class MainActivity : AppCompatActivity() {
                 }
             }
         }
+        binding.btnUploadPdf.setOnClickListener {
+            pdfPickerLauncher.launch("application/pdf")
+        }
     }
 
     private fun parseResponse(raw: String): Map<String, String> {
@@ -128,6 +147,38 @@ class MainActivity : AppCompatActivity() {
         )
         snackbar.show()
     }
+
+    private fun handlePdfUri(uri: Uri) {
+        try {
+            val inputStream = contentResolver.openInputStream(uri) ?: return
+            val extractedText = StringBuilder()
+
+            val pdfDocument = PDDocument.load(inputStream)
+            val stripper = PDFTextStripper()
+
+            for (page in 0 until pdfDocument.numberOfPages) {
+                stripper.startPage = page + 1
+                stripper.endPage = page + 1
+                extractedText.append(stripper.getText(pdfDocument))
+            }
+
+            pdfDocument.close()
+            inputStream.close()
+
+            val text = extractedText.toString().trim()
+
+            if (text.isBlank()) {
+                showError("Couldn't extract text from this PDF.") {}
+                return
+            }
+
+            binding.etResumeInput.setText(text)
+
+        } catch (e: Exception) {
+            showError("Failed to read PDF: ${e.message}") {}
+        }
+    }
+
 
     private fun animateDots(dialog: Dialog) {
         val dot1 = dialog.findViewById<View>(R.id.dot1)

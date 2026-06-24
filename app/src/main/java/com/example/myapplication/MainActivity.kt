@@ -14,6 +14,8 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import android.animation.ObjectAnimator
 import android.view.View
+import androidx.core.content.ContextCompat
+import com.google.android.material.snackbar.Snackbar
 
 class MainActivity : AppCompatActivity() {
 
@@ -77,11 +79,19 @@ class MainActivity : AppCompatActivity() {
                     startActivity(intent)
 
                 } else {
-                    Toast.makeText(
-                        this@MainActivity,
-                        "Error: ${result.exceptionOrNull()?.message}",
-                        Toast.LENGTH_LONG
-                    ).show()
+                    val exception = result.exceptionOrNull()
+                    val message = when {
+                        exception?.message?.contains("Failed to connect") == true ->
+                            "Can't reach LM Studio. Is the server running?"
+                        exception?.message?.contains("timeout") == true ->
+                            "Analysis timed out. Try a shorter resume."
+                        else ->
+                            "Something went wrong. Please try again."
+                    }
+
+                    showError(message) {
+                        binding.btnAnalyze.performClick()
+                    }
                 }
             }
         }
@@ -101,6 +111,22 @@ class MainActivity : AppCompatActivity() {
         result["suggestions"] = suggestionsRegex.find(raw)?.groupValues?.get(1)?.trim() ?: ""
 
         return result
+    }
+
+    private fun showError(message: String, onRetry: () -> Unit) {
+        val snackbar = Snackbar.make(binding.root, message, Snackbar.LENGTH_INDEFINITE)
+
+        snackbar.setAction("Retry") { onRetry() }
+        snackbar.setBackgroundTint(
+            ContextCompat.getColor(this, R.color.bg_surface_raised)
+        )
+        snackbar.setTextColor(
+            ContextCompat.getColor(this, R.color.text_primary)
+        )
+        snackbar.setActionTextColor(
+            ContextCompat.getColor(this, R.color.accent_primary)
+        )
+        snackbar.show()
     }
 
     private fun animateDots(dialog: Dialog) {

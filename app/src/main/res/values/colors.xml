@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <color name="bg_deepest">#0D1117</color>      <!-- screen background -->
+    <color name="bg_surface">#161B22</color>      <!-- cards, input fields -->
+    <color name="bg_surface_raised">#21262D</color> <!-- elevated elements, dialogs -->
+
+    <!-- Accent — used SPARINGLY, only for actions/highlights -->
+    <color name="accent_primary">#58A6FF</color>   <!-- electric blue -->
+    <color name="accent_secondary">#7C3AED</color> <!-- purple, for gradients -->
+
+    <!-- Text -->
+    <color name="text_primary">#F0F6FC</color>     <!-- near-white, headings -->
+    <color name="text_secondary">#8B949E</color>   <!-- muted gray, hints/labels -->
+
+    <!-- Status colors for results screen later -->
+    <color name="status_success">#3FB950</color>
+    <color name="status_warning">#D29922</color>
+    <color name="status_error">#F85149</color>
+
+    <!-- Borders/dividers -->
+    <color name="border_subtle">#30363D</color>
+</resources>

@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Display: hero numbers (the big score) -->
+    <dimen name="text_display">48sp</dimen>
+
+    <!-- Headings -->
+    <dimen name="text_h1">26sp</dimen>   <!-- screen titles -->
+    <dimen name="text_h2">20sp</dimen>   <!-- section headers -->
+    <dimen name="text_h3">16sp</dimen>   <!-- card titles -->
+
+    <!-- Body -->
+    <dimen name="text_body">14sp</dimen>
+    <dimen name="text_body_small">12sp</dimen>
+
+    <!-- Labels/meta -->
+    <dimen name="text_label">11sp</dimen>
+</resources>
